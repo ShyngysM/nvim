@@ -1,4 +1,4 @@
 return {
-  -- disable trouble
+  -- disable tabline
   { "akinsho/bufferline.nvim", enabled = false },
 }
