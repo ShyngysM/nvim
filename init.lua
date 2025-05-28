@@ -1,2 +1,17 @@
 -- bootstrap lazy.nvim, LazyVim and your plugins
 require("config.lazy")
+-- Very sad dunno how to set it up
+-- require("lspconfig").clangd.setup({
+--   cmd = { "clangd", "--compile-commands-dir=.", "--header-insertion=never" },
+--   filetypes = { "c", "cpp", "objc", "objcpp" },
+--   root_dir = require("lspconfig/util").root_pattern("compile_commands.json", ".git"),
+--   settings = {
+--     clangd = {
+--       args = {
+--         "-I/home/archingis/dev/stm32/h7a3zi_combine2/Drivers/STM32H7xx_HAL_Driver/Inc",
+--         "-I/home/archingis/dev/stm32/h7a3zi_combine2/Drivers/CMSIS/Device/ST/STM32H7xx/Include",
+--         "-I/home/archingis/dev/stm32/h7a3zi_combine2/Drivers/CMSIS/Include",
+--       },
+--     },
+--   },
+-- })
