@@ -1,21 +1,21 @@
 return {
-  'NvChad/nvterm',
+  "NvChad/nvterm",
   config = function()
-    require('nvterm').setup {
+    require("nvterm").setup({
       terminals = {
         shell = vim.o.shell,
         list = {},
         type_opts = {
           float = {
-            relative = 'editor',
+            relative = "editor",
             row = 0.3,
             col = 0.25,
             width = 0.5,
             height = 0.4,
-            border = 'single',
+            border = "single",
           },
-          horizontal = { location = 'rightbelow', split_ratio = 0.4 },
-          vertical = { location = 'rightbelow', split_ratio = 0.7 },
+          horizontal = { location = "rightbelow", split_ratio = 0.4 },
+          vertical = { location = "rightbelow", split_ratio = 0.6 },
         },
       },
       behavior = {
@@ -26,6 +26,6 @@ return {
         close_on_exit = true,
         auto_insert = true,
       },
-    }
+    })
   end,
 }
