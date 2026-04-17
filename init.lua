@@ -1,4 +1,6 @@
--- Bootstrap lazy.nvim (minimalist plugin manager)
+-- ========================================================================== --
+-- ==                           PLUGIN MANAGER                             == --
+-- ========================================================================== --
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath })
@@ -11,93 +13,97 @@ require("lazy").setup({
   "williamboman/mason-lspconfig.nvim",
 })
 
-
-
-
--- ========== Basic Settings ==========
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.expandtab = true
-vim.opt.shiftwidth = 2
-vim.opt.tabstop = 2
-vim.opt.smartindent = true
-vim.opt.wrap = false
-vim.opt.termguicolors = true
-vim.opt.cursorline = true
-vim.opt.scrolloff = 8
-vim.opt.ignorecase = true    -- Ignore case when searching...
-vim.opt.smartcase = true     -- ...unless you type a capital letter
-vim.opt.inccommand = "split" -- Preview substitutions in a split window as you type!
-vim.g.netrw_banner = 0       -- Hide that huge, ugly help banner
-vim.g.netrw_liststyle = 3    -- Tree-style view
-vim.g.netrw_winsize = 25     -- Window size 25%
--- ========== Leader Key ==========
+-- ========================================================================== --
+-- ==                            BASIC SETTINGS                            == --
+-- ========================================================================== --
 vim.g.mapleader = " "
 
--- ========== Keymaps ==========
+local opt = vim.opt
+opt.number = true
+opt.relativenumber = true
+opt.expandtab = true
+opt.shiftwidth = 2
+opt.tabstop = 2
+opt.smartindent = true
+opt.wrap = false
+opt.termguicolors = true
+opt.cursorline = true
+opt.scrolloff = 8
+opt.ignorecase = true    -- Case-insensitive search
+opt.smartcase = true     -- Case-sensitive if capitals used
+opt.inccommand = "split" -- Live preview of substitutions
+opt.clipboard = "unnamedplus" -- Sync with system clipboard
+
+-- Netrw (Built-in File Explorer)
+vim.g.netrw_banner = 0
+vim.g.netrw_liststyle = 3
+vim.g.netrw_winsize = 25
+
+-- ========================================================================== --
+-- ==                               KEYMAPS                                == --
+-- ========================================================================== --
 local map = vim.keymap.set
+
+-- General
 map("n", "<leader>w", ":w<CR>", { desc = "Save file" })
 map("n", "<leader>q", ":q<CR>", { desc = "Quit" })
-map("n", "<leader>h", ":nohlsearch<CR>", { desc = "Clear search highlights" })
+map("n", "<leader>h", ":nohlsearch<CR>", { desc = "Clear highlights" })
+map("n", "<Esc>", "<cmd>nohlsearch<CR><Esc>")
+
+-- Window Management
 map("n", "<leader>v", ":vsplit<CR>", { desc = "Vertical split" })
 map("n", "<leader>s", ":split<CR>", { desc = "Horizontal split" })
-map("n", "<leader>e", ":Lexplore<CR>", { desc = "Toggle file explorer" })
-map("n", "<C-h>", "<C-w>h") -- Move left
-map("n", "<C-j>", "<C-w>j") -- Move down
-map("n", "<C-k>", "<C-w>k") -- Move up
-map("n", "<C-l>", "<C-w>l") -- Move right
--- ESC to clear search highlights
-map("n", "<Esc>", "<cmd>nohlsearch<CR><Esc>", { desc = "Clear highlights" })
+map("n", "<C-h>", "<C-w>h")
+map("n", "<C-j>", "<C-w>j")
+map("n", "<C-k>", "<C-w>k")
+map("n", "<C-l>", "<C-w>l")
 
--- Move text up and down in Visual Mode
+-- File Explorer
+map("n", "<leader>e", ":Lexplore<CR>", { desc = "Toggle Explorer" })
+
+-- Visual Mode: Move lines
 map("v", "K", ":m '<-2<CR>gv=gv")
 map("v", "J", ":m '>+1<CR>gv=gv")
 
--- ========== Buffer Shortcuts ==========
-map("n", "<leader>bn", ":bnext<CR>", { desc = "Next buffer" })
-map("n", "<leader>bp", ":bprevious<CR>", { desc = "Previous buffer" })
-map("n", "<leader>bd", ":bdelete<CR>", { desc = "Close current buffer" })
-map("n", "<leader>bl", ":ls<CR>", { desc = "List buffers" })
-map("n", "<leader>bc", ":enew<CR>", { desc = "Create new buffer" })  -- NEW
+-- Buffers
+map("n", "<leader>bn", ":bnext<CR>")
+map("n", "<leader>bp", ":bprevious<CR>")
+map("n", "<leader>bd", ":bdelete<CR>")
+map("n", "<leader>bl", ":ls<CR>")
+map("n", "<leader>bc", ":enew<CR>")
 
--- Jump to buffer by number
-map("n", "<leader>1", ":buffer 1<CR>")
-map("n", "<leader>2", ":buffer 2<CR>")
-map("n", "<leader>3", ":buffer 3<CR>")
-map("n", "<leader>4", ":buffer 4<CR>")
-map("n", "<leader>5", ":buffer 5<CR>")
+for i = 1, 5 do
+  map("n", "<leader>" .. i, ":buffer " .. i .. "<CR>")
+end
 
--- ========== Simple Colorscheme ==========
-vim.cmd("highlight Normal guibg=NONE")
-vim.cmd("colorscheme desert")
+-- Terminal
+map("t", "<Esc>", [[<C-\><C-n>]], { noremap = true, silent = true })
 
--- ========== Basic Autocommands ==========
+-- ========================================================================== --
+-- ==                             AUTOCOMMANDS                             == --
+-- ========================================================================== --
+local group = vim.api.nvim_create_augroup("CustomConfigs", { clear = true })
+
 -- Remove trailing whitespace on save
 vim.api.nvim_create_autocmd("BufWritePre", {
+  group = group,
   pattern = "*",
   callback = function()
     vim.cmd([[%s/\s\+$//e]])
   end,
 })
 
--- Highlight yanked text
+-- Highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
-  pattern = "*",
+  group = group,
   callback = function()
-    vim.highlight.on_yank({timeout = 200})
+    vim.highlight.on_yank({ timeout = 200 })
   end,
 })
 
--- ========== Terminal Mode Escape ==========
--- Map ESC to leave terminal mode
-vim.api.nvim_set_keymap(
-  "t",               -- terminal mode
-  "<Esc>",           -- key
-  "<C-\\><C-n>",     -- sequence to exit terminal mode
-  { noremap = true, silent = true }
-)
-
--- Yank to windows clipboard
+-- ========================================================================== --
+-- ==                             WSL CLIPBOARD                            == --
+-- ========================================================================== --
 if vim.fn.has("wsl") == 1 then
   vim.g.clipboard = {
     name = "win32yank-wsl",
@@ -113,27 +119,68 @@ if vim.fn.has("wsl") == 1 then
   }
 end
 
--- This ensures that 'y' in Neovim automatically hits the Windows clipboard
-vim.opt.clipboard = "unnamedplus"
-
--- LSP --
+-- ========================================================================== --
+-- ==                                 LSP                                  == --
+-- ========================================================================== --
 require("mason").setup()
 require("mason-lspconfig").setup({
-    ensure_installed = { "lua_ls" } -- Add more servers here (e.g., "pyright", "tsserver")
+  ensure_installed = { "lua_ls" }
 })
 
-local lspconfig = require('lspconfig')
 local on_attach = function(_, bufnr)
   local opts = { buffer = bufnr }
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-  vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-  vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-  vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+  map('n', 'gd', vim.lsp.buf.definition, opts)
+  map('n', 'K', vim.lsp.buf.hover, opts)
+  map('n', '<leader>rn', vim.lsp.buf.rename, opts)
+  map('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+  map('n', 'gr', vim.lsp.buf.references, opts)
 end
 
--- Setup specifically for Lua (for your config!)
-lspconfig.lua_ls.setup({
-  on_attach = on_attach,
-  settings = { Lua = { diagnostics = { globals = { 'vim' } } } }
-})
+-- LSP Config (Future-proof for 0.11+)
+if vim.lsp.config then
+  vim.lsp.config("lua_ls", {
+    on_attach = on_attach,
+    settings = { Lua = { diagnostics = { globals = { 'vim' } } } }
+  })
+  vim.lsp.enable("lua_ls")
+else
+  -- Fallback for older versions
+  require('lspconfig').lua_ls.setup({
+    on_attach = on_attach,
+    settings = { Lua = { diagnostics = { globals = { 'vim' } } } }
+  })
+end
+
+-- ========================================================================== --
+-- ==                              COLORSCHEME                             == --
+-- ========================================================================== --
+vim.cmd("colorscheme desert")
+vim.cmd("highlight Normal guibg=NONE")
+
+-- ========================================================================== --
+-- ==                           CUSTOM STATUSLINE                          == --
+-- ========================================================================== --
+local function statusline()
+  local set_color_1 = "%#PmenuSel#"  -- Highlights for the mode/file
+  local set_color_2 = "%#LineNr#"    -- Highlights for the path/info
+  local reset_color = "%*"           -- Reset highlight
+
+  return table.concat({
+    set_color_1,
+    " %f ",                          -- File path
+    set_color_2,
+    " %m%r%h%w ",                    -- Modified, Read-only, Help, Preview flags
+    reset_color,
+    "%= ",                           -- Right align starts here
+    set_color_2,
+    " %y ",                          -- File type
+    " %p%% ",                        -- Percentage through file
+    set_color_1,
+    " %l:%c ",                       -- Line:Column
+    " "
+  })
+end
+
+vim.opt.statusline = statusline()
+-- Always show the statusline
+vim.opt.laststatus = 2
